@@ -596,8 +596,15 @@ public class SakaiProxyImpl implements SakaiProxy {
 			return null;
 		}
 
-		EnrollmentSet enrollmentSet = courseManagementService
-				.getEnrollmentSet(enrollmentSetId);
+		EnrollmentSet enrollmentSet = null;
+		try {
+			enrollmentSet = courseManagementService
+					.getEnrollmentSet(enrollmentSetId);
+		}
+		catch (IdNotFoundException idNotFoundException){
+			// This is okay, let this go, as we're not expecting
+			// the site necessarily to be part of coursemanagement.
+		}
 
 		if (null == enrollmentSet) {
 			return null;
