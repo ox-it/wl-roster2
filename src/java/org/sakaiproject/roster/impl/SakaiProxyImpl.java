@@ -425,7 +425,13 @@ public class SakaiProxyImpl implements SakaiProxy {
 		
 		Set<String> userIds = new HashSet<String>();
 		for (Member member : membership) {
-			userIds.add(member.getUserEid());
+			String userId = member.getUserId();
+			userIds.add(userId);
+
+			// If this member is not in the authzGroup, remove them.
+			if (authzGroup.getMember(userId) == null) {
+				membership.remove(member);
+			}
 		}
 
 		Set<String> hiddenUserIds = privacyManager.findHidden(
@@ -442,9 +448,9 @@ public class SakaiProxyImpl implements SakaiProxy {
 		
 		// determine filtered membership
 		for (Member member : membership) {
-			
-			// skip if privacy restricted
-			if (hiddenUserIds.contains(member.getUserEid())) {
+			String userId = member.getUserId();
+			// skip if privacy restricted and not the current user
+			if (!userId.equals(currentUserId) && hiddenUserIds.contains(userId)) {
 				continue;
 			}
 			
